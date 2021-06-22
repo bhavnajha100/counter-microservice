@@ -12,16 +12,25 @@ public class Controller {
     @Autowired
     CounterRepo counterRepo;
 
+
     @GetMapping("/counter")
     public Integer getCounter()
-    {
-      return counterRepo.findById(123).get().getCounter();
-    }
-    @PostMapping("/counter")
-    public Integer saveCounter(@RequestBody Request request)
-    {
+    {          synchronized(this) {
         Counter counter = counterRepo.findById(123).get();
-        counter.setCounter(request.getData());
+        Integer counterValue = counter.getCounter() + 1;
+        counter.setCounter(counterValue);
         return counterRepo.save(counter).getCounter();
     }
+    }
+
+    @GetMapping("/decrementCounter")
+    public Integer decrementCounter(){
+        synchronized(this) {
+            Counter counter = counterRepo.findById(123).get();
+            Integer counterValue = counter.getCounter() - 1;
+            counter.setCounter(counterValue);
+            return counterRepo.save(counter).getCounter();
+        }
+    }
+
 }
